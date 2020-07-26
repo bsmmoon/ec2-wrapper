@@ -21,5 +21,7 @@ const Debug = ({ dispatch, state }) => (
 export default connect(state => ({
   state: {
     debug: state.app.debug,
+    loading: state.app.loading,
+    step: state.app.step,
   }
 }))(Debug)
