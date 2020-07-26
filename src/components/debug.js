@@ -23,5 +23,7 @@ export default connect(state => ({
     debug: state.app.debug,
     loading: state.app.loading,
     step: state.app.step,
+    accessKeyId: state.app.accessKeyId,
+    secretAccessKey: state.app.secretAccessKey,
   }
 }))(Debug)

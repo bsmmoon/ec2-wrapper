@@ -3,6 +3,8 @@ const initialState = {
   debug: false,
   loading: false,
   step: "0",
+  accessKeyId: "",
+  secretAccessKey: "",
 }
 
 // ACTIONS
@@ -22,6 +24,11 @@ export const setStep = (step) => ({
   type: SET_STEP, step
 })
 
+const SET_STATE = "SET_STATE"
+export const setState = (key, value) => ({
+  type: SET_STATE, key, value
+})
+
 // REDUCER
 
 export default (state = initialState, action) => {
@@ -32,6 +39,10 @@ export default (state = initialState, action) => {
       return { ...state, loading: action.loading }
     case SET_STEP:
       return { ...state, step: action.step }
+    case SET_STATE:
+      let newState = { ...state }
+      newState[action.key] = action.value
+      return newState
     default:
       return state
   }
