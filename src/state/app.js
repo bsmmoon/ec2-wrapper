@@ -5,6 +5,7 @@ const initialState = {
   step: "0",
   accessKeyId: "",
   secretAccessKey: "",
+  pem: "",
 }
 
 // ACTIONS

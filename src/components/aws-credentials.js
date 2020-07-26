@@ -34,7 +34,7 @@ const onSubmit = ({
     if (err) {
       alert(err.stack)
     } else {
-      alert(`SUCCESS ${JSON.stringify(data)}`)
+      // alert(`SUCCESS ${JSON.stringify(data)}`)
     }
   })
 
@@ -42,7 +42,7 @@ const onSubmit = ({
     if (err) {
       alert(err.stack)
     } else {
-      alert(`Access key: ${AWS.config.credentials.accessKeyId}`)
+      // alert(`Access key: ${AWS.config.credentials.accessKeyId}`)
       dispatch(setState("step", "1"))
     }
   })
