@@ -24,20 +24,6 @@ const onSubmit = ({
     region: REGION,
   })
 
-  let ec2 = new AWS.EC2()
-
-  let params = {
-    DryRun: false
-  }
-
-  ec2.describeInstances(params, (err, data) => {
-    if (err) {
-      alert(err.stack)
-    } else {
-      // alert(`SUCCESS ${JSON.stringify(data)}`)
-    }
-  })
-
   AWS.config.getCredentials((err) => {
     if (err) {
       alert(err.stack)

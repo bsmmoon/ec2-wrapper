@@ -25,6 +25,8 @@ export default connect(state => ({
     step: state.app.step,
     accessKeyId: state.app.accessKeyId,
     secretAccessKey: state.app.secretAccessKey,
-    pem: state.app.pem,
+    instanceId: state.app.instanceId,
+    publicDnsName: state.app.publicDnsName,
+    cache: state.app.cache,
   }
 }))(Debug)

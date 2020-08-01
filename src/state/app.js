@@ -6,6 +6,9 @@ const initialState = {
   accessKeyId: "",
   secretAccessKey: "",
   pem: "",
+  instanceId: "",
+  publicDnsName: "",
+  cache: "",
 }
 
 // ACTIONS

@@ -8,6 +8,50 @@ import {
   setState,
 } from "../state/app"
 
+import AWS from "aws-sdk"
+
+const createInstance = ({
+  dispatch,
+}) => {
+  let instanceParams = {
+    ImageId: "ami-09a4a9ce71ff3f20b",
+    InstanceType: "t2.micro",
+    KeyName: "ubuntu1",
+    MinCount: 1,
+    MaxCount: 1,
+  }
+
+  let instancePromise = new AWS.EC2().runInstances(instanceParams).promise()
+
+  instancePromise
+    .then((data) => {
+      dispatch(setState("cache", JSON.stringify(data)))
+      let instanceId = data.Instances[0].InstanceId
+      dispatch(setState("instanceId", instanceId))
+      waitForPublicDns(dispatch, instanceId)
+    }).catch((err) => {
+      alert(err.stack)
+    })
+}
+
+const waitForPublicDns = (dispatch, instanceId) => {
+  let ec2 = new AWS.EC2()
+
+  let params = {
+    InstanceIds: [instanceId],
+    DryRun: false
+  }
+
+  ec2.describeInstances(params, (err, data) => {
+    if (err) {
+      alert(err.stack)
+    } else {
+      let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
+      dispatch(setState("publicDnsName", publicDnsName))
+    }
+  })
+}
+
 let fileInput
 const handleUploadClick = () => {
   fileInput.click()
@@ -41,6 +85,8 @@ const copyToClipboard = (text) => {
 const InstanceCreation = ({
   dispatch,
   pem,
+  publicDnsName,
+  instanceId,
 }) => (
   <div>
     <Form>
@@ -72,6 +118,27 @@ const InstanceCreation = ({
           onClick={() => copyToClipboard(pem)}
         >{pem}</div>
       </Form.Group>
+      <div hidden={!pem}>
+        <Form.Group>
+          <Button block
+            onClick={() => createInstance({
+              dispatch
+            })}
+          >Create Instance</Button>
+        </Form.Group>
+      </div>
+      <Form.Group>
+        <div
+          style={{fontSize: 10, fontStyle: "italic"}}
+          onClick={() => copyToClipboard(instanceId)}
+        >{instanceId}</div>
+      </Form.Group>
+      <Form.Group>
+        <div
+          style={{fontSize: 10, fontStyle: "italic"}}
+          onClick={() => copyToClipboard(publicDnsName)}
+        >{publicDnsName}</div>
+      </Form.Group>
     </Form>
     <h3>What's happening?</h3>
     <code>
@@ -83,5 +150,7 @@ const InstanceCreation = ({
 )
 
 export default connect(state => ({
-  pem: state.app.pem
+  pem: state.app.pem,
+  publicDnsName: state.app.publicDnsName,
+  instanceId: state.app.instanceId,
 }), null) (InstanceCreation)
