@@ -25,7 +25,6 @@ const createInstance = ({
 
   instancePromise
     .then((data) => {
-      dispatch(setState("cache", JSON.stringify(data)))
       let instanceId = data.Instances[0].InstanceId
       dispatch(setState("instanceId", instanceId))
       waitForPublicDns(dispatch, instanceId)
@@ -42,14 +41,25 @@ const waitForPublicDns = (dispatch, instanceId) => {
     DryRun: false
   }
 
-  ec2.describeInstances(params, (err, data) => {
-    if (err) {
-      alert(err.stack)
-    } else {
-      let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
-      dispatch(setState("publicDnsName", publicDnsName))
-    }
-  })
+  let interval = setInterval(() => waitForPublicDnsName(), 1000)
+
+  let seconds = 0
+
+  const waitForPublicDnsName = () => { 
+    ec2.describeInstances(params, (err, data) => {
+      if (err) {
+        alert(err.stack)
+      } else {
+        let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
+        if (!!publicDnsName) {
+          dispatch(setState("publicDnsName", publicDnsName))
+          clearInterval(interval)
+        } else {
+          dispatch(setState("publicDnsName", seconds++))
+        }
+      }
+    })
+  }
 }
 
 let fileInput
