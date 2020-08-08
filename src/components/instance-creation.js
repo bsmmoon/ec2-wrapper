@@ -53,32 +53,13 @@ const waitForPublicDns = (dispatch, instanceId) => {
         let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
         if (!!publicDnsName) {
           dispatch(setState("publicDnsName", publicDnsName))
+          dispatch(setState("step", "3"))
           clearInterval(interval)
         } else {
           dispatch(setState("publicDnsName", seconds++))
         }
       }
     })
-  }
-}
-
-let fileInput
-const handleUploadClick = () => {
-  fileInput.click()
-}
-
-const handleUpload = ({
-  dispatch,
-  event,
-}) => {
-  let file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const text = e.target.result
-      dispatch(setState("pem", text))
-    }
-    reader.readAsText(file)
   }
 }
 
@@ -101,42 +82,18 @@ const InstanceCreation = ({
   <div>
     <Form>
       <Form.Group>
-        <Button block
-          disabled 
-        >Create a New Key Pair</Button>
-      </Form.Group>
-      <Form.Group style={{textAlign: "center"}}>
-        or
-      </Form.Group>
-      <Form.Group>
-        <Button block
-          onClick={handleUploadClick}
-        >Upload a Key Pair (.pem)</Button>
-        <input
-          type="file"
-          style={{display: "none"}}
-          ref={input => fileInput = input}
-          onChange={(event) => handleUpload({ 
-            dispatch,
-            event,
-          })}
-        />
-      </Form.Group>
-      <Form.Group>
         <div
           style={{fontSize: 7, fontStyle: "italic"}}
           onClick={() => copyToClipboard(pem)}
         >{pem}</div>
       </Form.Group>
-      <div hidden={!pem}>
-        <Form.Group>
-          <Button block
-            onClick={() => createInstance({
-              dispatch
-            })}
-          >Create Instance</Button>
-        </Form.Group>
-      </div>
+      <Form.Group>
+        <Button block
+          onClick={() => createInstance({
+            dispatch
+          })}
+        >Create Instance</Button>
+      </Form.Group>
       <Form.Group>
         <div
           style={{fontSize: 10, fontStyle: "italic"}}
