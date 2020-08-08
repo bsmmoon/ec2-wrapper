@@ -63,30 +63,13 @@ const waitForPublicDns = (dispatch, instanceId) => {
   }
 }
 
-const copyToClipboard = (text) => {
-  var dummy = document.createElement("textarea");
-  document.body.appendChild(dummy);
-  dummy.value = text;
-  dummy.select();
-  document.execCommand("copy");
-  document.body.removeChild(dummy);
-  alert("Copied to Clipboard")
-}
-
 const InstanceCreation = ({
   dispatch,
-  pem,
   publicDnsName,
   instanceId,
 }) => (
   <div>
     <Form>
-      <Form.Group>
-        <div
-          style={{fontSize: 7, fontStyle: "italic"}}
-          onClick={() => copyToClipboard(pem)}
-        >{pem}</div>
-      </Form.Group>
       <Form.Group>
         <Button block
           onClick={() => createInstance({
@@ -97,22 +80,16 @@ const InstanceCreation = ({
       <Form.Group>
         <div
           style={{fontSize: 10, fontStyle: "italic"}}
-          onClick={() => copyToClipboard(instanceId)}
-        >{instanceId}</div>
+          hidden={!instanceId}
+        >Instance ID: {instanceId}</div>
       </Form.Group>
       <Form.Group>
         <div
           style={{fontSize: 10, fontStyle: "italic"}}
-          onClick={() => copyToClipboard(publicDnsName)}
-        >{publicDnsName}</div>
+          hidden={!publicDnsName}
+        >Public DNS Name: {publicDnsName}</div>
       </Form.Group>
     </Form>
-    <h3>What's happening?</h3>
-    <code>
-      {"AWS.Resource.signin(abc@gmail.com, *****)"}
-      <br/>
-      {"AWS.Resource.create(type: \"instance\")"}
-    </code>
   </div>
 )
 

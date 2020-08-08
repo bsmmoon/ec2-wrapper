@@ -8,8 +8,6 @@ import {
   setState,
 } from "../state/app"
 
-import AWS from "aws-sdk"
-
 const script = (pem) => {
   return `echo "${pem}" >> key.pem`
 }
@@ -34,6 +32,7 @@ const PemFile = ({
         <div
           style={{fontSize: 7, fontStyle: "italic"}}
           onClick={() => copyToClipboard(script(pem))}
+          onKeyDown={() => copyToClipboard(script(pem))}
         >{script(pem)}</div>
       </Form.Group>
     </Form>

@@ -1,14 +1,8 @@
 import React from "react"
 
-import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 
 import { connect } from "react-redux"
-import {
-  setState,
-} from "../state/app"
-
-import AWS from "aws-sdk"
 
 const script = (publicDnsName, keyPath) => {
   return `ssh -i ${keyPath} ubuntu@${publicDnsName}`
@@ -34,6 +28,7 @@ const PemFile = ({
         <div
           style={{ fontStyle: "italic" }}
           onClick={() => copyToClipboard(script(publicDnsName, "key.pem"))}
+          onKeyDown={() => copyToClipboard(script(publicDnsName, "key.pem"))}
         >
           <br />
           {script(publicDnsName, "key.pem")}
