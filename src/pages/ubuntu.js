@@ -55,7 +55,7 @@ const IndexPage = ({dispatch, loading, step}) => (
             as={Button}
             variant="link"
             eventKey="InstanceCreation"
-          >Step 3. Prepare a new Ubuntu machine
+          >Step 3. Prepare an Ubuntu machine
           </Accordion.Toggle>
         </Card.Header>
         <Accordion.Collapse eventKey="InstanceCreation">

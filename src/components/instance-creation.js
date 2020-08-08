@@ -48,7 +48,7 @@ const waitForPublicDns = (dispatch, instanceId) => {
   const waitForPublicDnsName = () => { 
     ec2.describeInstances(params, (err, data) => {
       if (err) {
-        alert(err.stack)
+        throw err
       } else {
         let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
         if (!!publicDnsName) {
@@ -63,6 +63,33 @@ const waitForPublicDns = (dispatch, instanceId) => {
   }
 }
 
+const fetchInstances = ({
+  dispatch,
+  options
+}) => {
+  let ec2 = new AWS.EC2()
+
+  let params = {
+    ...options,
+    DryRun: false
+  }
+
+  ec2.describeInstances(params, (err, data) => {
+    if (err) {
+      throw err
+    } else {
+      data = data.Reservations[0].Instances
+        .map((instance) => ({
+          ImageId: instance.ImageId,
+          InstanceId: instance.InstanceId,
+          LaunchTime: instance.LaunchTime,
+          KeyName: instance.KeyName,
+        }))
+      dispatch(setState("cache", data))
+    }
+  })
+}
+
 const InstanceCreation = ({
   dispatch,
   publicDnsName,
@@ -70,6 +97,16 @@ const InstanceCreation = ({
 }) => (
   <div>
     <Form>
+      <Form.Group>
+        <Button block
+          onClick={() => fetchInstances({
+            dispatch,
+          })}
+        >Fetch Existing Instances</Button>
+      </Form.Group>
+      <Form.Group>
+        or
+      </Form.Group>
       <Form.Group>
         <Button block
           onClick={() => createInstance({
