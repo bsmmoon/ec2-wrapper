@@ -20,13 +20,14 @@ const Debug = ({ dispatch, state }) => (
 
 export default connect(state => ({
   state: {
-    debug: state.app.debug,
-    loading: state.app.loading,
-    step: state.app.step,
     accessKeyId: state.app.accessKeyId,
-    secretAccessKey: state.app.secretAccessKey,
-    instanceId: state.app.instanceId,
-    publicDnsName: state.app.publicDnsName,
     cache: state.app.cache,
+    debug: state.app.debug,
+    instances: state.app.instances,
+    instanceId: state.app.instanceId,
+    loading: state.app.loading,
+    publicDnsName: state.app.publicDnsName,
+    secretAccessKey: state.app.secretAccessKey,
+    step: state.app.step,
   }
 }))(Debug)

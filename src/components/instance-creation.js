@@ -78,14 +78,17 @@ const fetchInstances = ({
     if (err) {
       throw err
     } else {
-      data = data.Reservations[0].Instances
-        .map((instance) => ({
-          ImageId: instance.ImageId,
-          InstanceId: instance.InstanceId,
-          LaunchTime: instance.LaunchTime,
-          KeyName: instance.KeyName,
-        }))
-      dispatch(setState("cache", data))
+      data = data.Reservations
+        .map((reservation) => {
+          let instance = reservation.Instances[0]
+          return {
+            ImageId: instance.ImageId,
+            InstanceId: instance.InstanceId,
+            LaunchTime: instance.LaunchTime,
+            KeyName: instance.KeyName,
+          }
+        })
+      dispatch(setState("instances", data))
     }
   })
 }
@@ -94,6 +97,7 @@ const InstanceCreation = ({
   dispatch,
   publicDnsName,
   instanceId,
+  instances,
 }) => (
   <div>
     <Form>
@@ -103,6 +107,20 @@ const InstanceCreation = ({
             dispatch,
           })}
         >Fetch Existing Instances</Button>
+      </Form.Group>
+      <Form.Group>
+        <Form.Control as="select">
+          {
+            instances.map((instance) => <option key={instance.InstanceId}>
+              {[
+                instance.ImageId,
+                instance.InstanceId,
+                instance.KeyName,
+                instance.LaunchTime.toLocaleString(),
+              ].join(", ")}
+            </option>)
+          }
+        </Form.Control>
       </Form.Group>
       <Form.Group>
         or
@@ -134,4 +152,5 @@ export default connect(state => ({
   pem: state.app.pem,
   publicDnsName: state.app.publicDnsName,
   instanceId: state.app.instanceId,
+  instances: state.app.instances,
 }), null) (InstanceCreation)

@@ -1,14 +1,15 @@
 
 const initialState = {
-  debug: false,
-  loading: false,
-  step: "AWSCredentials",
   accessKeyId: "",
-  secretAccessKey: "",
-  pem: "",
-  instanceId: "",
-  publicDnsName: "",
   cache: "",
+  debug: false,
+  instances: [],
+  instanceId: "",
+  loading: false,
+  pem: "",
+  publicDnsName: "",
+  secretAccessKey: "",
+  step: "AWSCredentials",
 }
 
 // ACTIONS
