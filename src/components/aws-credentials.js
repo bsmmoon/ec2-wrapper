@@ -29,7 +29,7 @@ const onSubmit = ({
       alert(err.stack)
     } else {
       // alert(`Access key: ${AWS.config.credentials.accessKeyId}`)
-      dispatch(setState("step", "1"))
+      dispatch(setState("step", "KeyPair"))
     }
   })
 }

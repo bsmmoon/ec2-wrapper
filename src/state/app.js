@@ -2,7 +2,7 @@
 const initialState = {
   debug: false,
   loading: false,
-  step: "0",
+  step: "AWSCredentials",
   accessKeyId: "",
   secretAccessKey: "",
   pem: "",

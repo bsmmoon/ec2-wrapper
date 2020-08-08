@@ -24,11 +24,11 @@ const IndexPage = ({dispatch, loading, step}) => (
           <Accordion.Toggle
             as={Button}
             variant="link"
-            eventKey="0"
+            eventKey="AWSCredentials"
           >Step 1. Provide AWS Access Key
           </Accordion.Toggle>
         </Card.Header>
-        <Accordion.Collapse eventKey="0">
+        <Accordion.Collapse eventKey="AWSCredentials">
           <Card.Body>
             <AWSCredentials />
           </Card.Body>
@@ -39,11 +39,11 @@ const IndexPage = ({dispatch, loading, step}) => (
           <Accordion.Toggle
             as={Button}
             variant="link"
-            eventKey="1"
+            eventKey="KeyPair"
           >Step 2. Prepare a Key Pair
           </Accordion.Toggle>
         </Card.Header>
-        <Accordion.Collapse eventKey="1">
+        <Accordion.Collapse eventKey="KeyPair">
           <Card.Body>
             <KeyPair />
           </Card.Body>
@@ -54,11 +54,11 @@ const IndexPage = ({dispatch, loading, step}) => (
           <Accordion.Toggle
             as={Button}
             variant="link"
-            eventKey="2"
+            eventKey="InstanceCreation"
           >Step 3. Prepare a new Ubuntu machine
           </Accordion.Toggle>
         </Card.Header>
-        <Accordion.Collapse eventKey="2">
+        <Accordion.Collapse eventKey="InstanceCreation">
           <Card.Body>
             <InstanceCreation />
           </Card.Body>
@@ -69,11 +69,11 @@ const IndexPage = ({dispatch, loading, step}) => (
           <Accordion.Toggle
             as={Button}
             variant="link"
-            eventKey="3"
+            eventKey="KeyScript"
           >Step 4. Prepare your .pem file
           </Accordion.Toggle>
         </Card.Header>
-        <Accordion.Collapse eventKey="3">
+        <Accordion.Collapse eventKey="KeyScript">
           <Card.Body>
             <KeyScript />
           </Card.Body>
@@ -84,11 +84,11 @@ const IndexPage = ({dispatch, loading, step}) => (
           <Accordion.Toggle
             as={Button}
             variant="link"
-            eventKey="4"
+            eventKey="SshScript"
           >Step 5. Prepare your ssh script
           </Accordion.Toggle>
         </Card.Header>
-        <Accordion.Collapse eventKey="4">
+        <Accordion.Collapse eventKey="SshScript">
           <Card.Body>
             <SshScript />
           </Card.Body>

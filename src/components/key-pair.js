@@ -23,7 +23,7 @@ const handleUpload = ({
     reader.onload = async (e) => {
       const text = e.target.result
       dispatch(setState("pem", text))
-      dispatch(setState("step", "2"))
+      dispatch(setState("step", "InstanceCreation"))
     }
     reader.readAsText(file)
   }

@@ -39,7 +39,7 @@ const PemFile = ({
     <Form>
       <Form.Group>
         <Button block
-          onClick={() => dispatch(setState("step", "4"))}
+          onClick={() => dispatch(setState("step", "SshScript"))}
         >Next</Button>
       </Form.Group>
     </Form>

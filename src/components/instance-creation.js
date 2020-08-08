@@ -53,7 +53,7 @@ const waitForPublicDns = (dispatch, instanceId) => {
         let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
         if (!!publicDnsName) {
           dispatch(setState("publicDnsName", publicDnsName))
-          dispatch(setState("step", "3"))
+          dispatch(setState("step", "KeyScript"))
           clearInterval(interval)
         } else {
           dispatch(setState("publicDnsName", seconds++))
