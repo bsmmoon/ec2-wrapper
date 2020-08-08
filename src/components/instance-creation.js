@@ -82,8 +82,8 @@ const fetchInstances = ({
         .map((reservation) => {
           let instance = reservation.Instances[0]
           return {
-            ImageId: instance.ImageId,
             InstanceId: instance.InstanceId,
+            PublicDnsName: instance.PublicDnsName,
             LaunchTime: instance.LaunchTime,
             KeyName: instance.KeyName,
           }
@@ -98,6 +98,7 @@ const InstanceCreation = ({
   publicDnsName,
   instanceId,
   instances,
+  selectedPublicDnsName,
 }) => (
   <div>
     <Form>
@@ -108,19 +109,35 @@ const InstanceCreation = ({
           })}
         >Fetch Existing Instances</Button>
       </Form.Group>
-      <Form.Group>
-        <Form.Control as="select">
+      <Form.Group hidden={instances.length === 0}>
+        <Form.Control
+          as="select"i
+          onChange={(event) => dispatch(setState("selectedPublicDnsName", event.target.value))}
+        >
+          <option selected disabled>Select an instance</option>
           {
-            instances.map((instance) => <option key={instance.InstanceId}>
-              {[
-                instance.ImageId,
-                instance.InstanceId,
-                instance.KeyName,
-                instance.LaunchTime.toLocaleString(),
-              ].join(", ")}
-            </option>)
+            instances
+              .filter((instance) => !!instance.PublicDnsName)
+              .map((instance) => <option key={instance.PublicDnsName}
+                value={instance.PublicDnsName}>
+                  {[
+                    instance.PublicDnsName,
+                    instance.InstanceId,
+                    instance.KeyName,
+                    instance.LaunchTime.toLocaleString(),
+                  ].join(", ")}
+                </option>
+              )
           }
         </Form.Control>
+      </Form.Group>
+      <Form.Group hidden={!selectedPublicDnsName}>
+        <Button block
+          onClick={() => {
+            dispatch(setState("publicDnsName", selectedPublicDnsName))
+            dispatch(setState("step", "KeyScript"))
+          }}
+        >Select Instance</Button>
       </Form.Group>
       <Form.Group>
         or
@@ -153,4 +170,5 @@ export default connect(state => ({
   publicDnsName: state.app.publicDnsName,
   instanceId: state.app.instanceId,
   instances: state.app.instances,
+  selectedPublicDnsName: state.app.selectedPublicDnsName,
 }), null) (InstanceCreation)

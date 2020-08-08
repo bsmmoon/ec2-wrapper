@@ -9,6 +9,7 @@ const initialState = {
   pem: "",
   publicDnsName: "",
   secretAccessKey: "",
+  selectedPublicDnsName: "",
   step: "AWSCredentials",
 }
 

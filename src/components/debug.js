@@ -28,6 +28,7 @@ export default connect(state => ({
     loading: state.app.loading,
     publicDnsName: state.app.publicDnsName,
     secretAccessKey: state.app.secretAccessKey,
+    selectedPublicDnsName: state.app.selectedPublicDnsName,
     step: state.app.step,
   }
 }))(Debug)
