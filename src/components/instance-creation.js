@@ -29,7 +29,7 @@ const createInstance = ({
       dispatch(setState("instanceId", instanceId))
       waitForPublicDns(dispatch, instanceId)
     }).catch((err) => {
-      alert(err.stack)
+      throw err
     })
 }
 
@@ -49,16 +49,17 @@ const waitForPublicDns = (dispatch, instanceId) => {
     ec2.describeInstances(params, (err, data) => {
       if (err) {
         throw err
-      } else {
-        let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
-        if (!!publicDnsName) {
-          dispatch(setState("publicDnsName", publicDnsName))
-          dispatch(setState("step", "KeyScript"))
-          clearInterval(interval)
-        } else {
-          dispatch(setState("publicDnsName", seconds++))
-        }
       }
+
+      let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
+      if (!publicDnsName) {
+        dispatch(setState("publicDnsName", seconds++))
+        return
+      }
+
+      dispatch(setState("publicDnsName", publicDnsName))
+      dispatch(setState("step", "KeyScript"))
+      clearInterval(interval)
     })
   }
 }
@@ -77,19 +78,18 @@ const fetchInstances = ({
   ec2.describeInstances(params, (err, data) => {
     if (err) {
       throw err
-    } else {
-      data = data.Reservations
-        .map((reservation) => {
-          let instance = reservation.Instances[0]
-          return {
-            InstanceId: instance.InstanceId,
-            PublicDnsName: instance.PublicDnsName,
-            LaunchTime: instance.LaunchTime,
-            KeyName: instance.KeyName,
-          }
-        })
-      dispatch(setState("instances", data))
     }
+    data = data.Reservations
+      .map((reservation) => {
+        let instance = reservation.Instances[0]
+        return {
+          InstanceId: instance.InstanceId,
+          PublicDnsName: instance.PublicDnsName,
+          LaunchTime: instance.LaunchTime,
+          KeyName: instance.KeyName,
+        }
+      })
+    dispatch(setState("instances", data))
   })
 }
 
