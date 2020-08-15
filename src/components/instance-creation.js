@@ -10,10 +10,62 @@ import {
 
 import AWS from "aws-sdk"
 
-const createInstance = ({
+const onClickCreateInstance = ({
   dispatch,
 }) => {
+  let ec2 = new AWS.EC2()
+
+  ec2.createSecurityGroup({
+    Description: "DESCRIPTION",
+    GroupName: "GROUP NAME",
+  }, (err, data) => {
+    if (err) return alert(err.message)
+
+    let GroupId = data.GroupId
+
+    ec2.authorizeSecurityGroupIngress({
+      GroupId,
+      IpPermissions:[
+        {
+          IpProtocol: "tcp",
+          FromPort: 80,
+          ToPort: 80,
+          IpRanges: [{"CidrIp":"0.0.0.0/0"}]
+        },
+        {
+          IpProtocol: "tcp",
+          FromPort: 22,
+          ToPort: 22,
+          IpRanges: [{"CidrIp":"0.0.0.0/0"}]
+        },
+      ]
+    }, (err, data) => {
+      if (err) return alert(err.message)
+
+      createInstance({
+        dispatch,
+        options: {
+          SecurityGroupIds: [GroupId],
+        },
+      }).then((data) => {
+        let instanceId = data.Instances[0].InstanceId
+        dispatch(setState("instanceId", instanceId))
+        waitForPublicDns(dispatch, instanceId)
+      }).catch((err) => {
+        return alert(err.message)
+      })
+    })
+  })
+}
+
+const createInstance = ({
+  dispatch,
+  options,
+}) => {
+  let ec2 = new AWS.EC2()
+  
   let instanceParams = {
+    ...options,
     ImageId: "ami-09a4a9ce71ff3f20b",
     InstanceType: "t2.micro",
     KeyName: "ubuntu1",
@@ -21,23 +73,14 @@ const createInstance = ({
     MaxCount: 1,
   }
 
-  let instancePromise = new AWS.EC2().runInstances(instanceParams).promise()
-
-  instancePromise
-    .then((data) => {
-      let instanceId = data.Instances[0].InstanceId
-      dispatch(setState("instanceId", instanceId))
-      waitForPublicDns(dispatch, instanceId)
-    }).catch((err) => {
-      throw err
-    })
+  return ec2.runInstances(instanceParams).promise()
 }
 
 const waitForPublicDns = (dispatch, instanceId) => {
   let ec2 = new AWS.EC2()
 
   let params = {
-    InstanceIds: [instanceId],
+    InstanceIds: [ instanceId ],
     DryRun: false
   }
 
@@ -47,9 +90,7 @@ const waitForPublicDns = (dispatch, instanceId) => {
 
   const waitForPublicDnsName = () => { 
     ec2.describeInstances(params, (err, data) => {
-      if (err) {
-        throw err
-      }
+      if (err) return alert(err.message)
 
       let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
       if (!publicDnsName) {
@@ -76,9 +117,8 @@ const fetchInstances = ({
   }
 
   ec2.describeInstances(params, (err, data) => {
-    if (err) {
-      throw err
-    }
+    if (err) return alert(err.message)
+    
     data = data.Reservations
       .map((reservation) => {
         let instance = reservation.Instances[0]
@@ -144,7 +184,7 @@ const InstanceCreation = ({
       </Form.Group>
       <Form.Group>
         <Button block
-          onClick={() => createInstance({
+          onClick={() => onClickCreateInstance({
             dispatch
           })}
         >Create Instance</Button>
