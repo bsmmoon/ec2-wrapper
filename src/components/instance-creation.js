@@ -8,128 +8,56 @@ import {
   setState,
 } from "../state/app"
 
-import AWS from "aws-sdk"
+import {
+  createInstance,
+  findInstances,
+} from "../helpers/aws-instance-helper"
+import { createSshSecurityGroup } from "../helpers/aws-security-group-helper"
 
 const onClickCreateInstance = ({
   dispatch,
 }) => {
-  let ec2 = new AWS.EC2()
-
-  ec2.createSecurityGroup({
-    Description: "DESCRIPTION",
-    GroupName: "GROUP NAME",
-  }, (err, data) => {
-    if (err) return alert(err.message)
-
-    let GroupId = data.GroupId
-
-    ec2.authorizeSecurityGroupIngress({
-      GroupId,
-      IpPermissions:[
-        {
-          IpProtocol: "tcp",
-          FromPort: 80,
-          ToPort: 80,
-          IpRanges: [{"CidrIp":"0.0.0.0/0"}]
-        },
-        {
-          IpProtocol: "tcp",
-          FromPort: 22,
-          ToPort: 22,
-          IpRanges: [{"CidrIp":"0.0.0.0/0"}]
-        },
-      ]
-    }, (err, data) => {
-      if (err) return alert(err.message)
-
+  createSshSecurityGroup({ name: "NAME2", callbacks: {
+    then: () => {
       createInstance({
-        dispatch,
-        options: {
-          SecurityGroupIds: [GroupId],
+        params: {
+          SecurityGroups: [ "NAME2" ],
         },
-      }).then((data) => {
-        let instanceId = data.Instances[0].InstanceId
-        dispatch(setState("instanceId", instanceId))
-        waitForPublicDns(dispatch, instanceId)
-      }).catch((err) => {
-        return alert(err.message)
-      })
-    })
-  })
-}
-
-const createInstance = ({
-  dispatch,
-  options,
-}) => {
-  let ec2 = new AWS.EC2()
-  
-  let instanceParams = {
-    ...options,
-    ImageId: "ami-09a4a9ce71ff3f20b",
-    InstanceType: "t2.micro",
-    KeyName: "ubuntu1",
-    MinCount: 1,
-    MaxCount: 1,
-  }
-
-  return ec2.runInstances(instanceParams).promise()
-}
-
-const waitForPublicDns = (dispatch, instanceId) => {
-  let ec2 = new AWS.EC2()
-
-  let params = {
-    InstanceIds: [ instanceId ],
-    DryRun: false
-  }
-
-  let interval = setInterval(() => waitForPublicDnsName(), 1000)
-
-  let seconds = 0
-
-  const waitForPublicDnsName = () => { 
-    ec2.describeInstances(params, (err, data) => {
-      if (err) return alert(err.message)
-
-      let publicDnsName = data.Reservations[0].Instances[0].PublicDnsName
-      if (!publicDnsName) {
-        dispatch(setState("publicDnsName", seconds++))
-        return
-      }
-
-      dispatch(setState("publicDnsName", publicDnsName))
-      dispatch(setState("step", "KeyScript"))
-      clearInterval(interval)
-    })
-  }
-}
-
-const fetchInstances = ({
-  dispatch,
-  options
-}) => {
-  let ec2 = new AWS.EC2()
-
-  let params = {
-    ...options,
-    DryRun: false
-  }
-
-  ec2.describeInstances(params, (err, data) => {
-    if (err) return alert(err.message)
-    
-    data = data.Reservations
-      .map((reservation) => {
-        let instance = reservation.Instances[0]
-        return {
-          InstanceId: instance.InstanceId,
-          PublicDnsName: instance.PublicDnsName,
-          LaunchTime: instance.LaunchTime,
-          KeyName: instance.KeyName,
+        callbacks: {
+          then: (data) => {
+            let instance = data.Reservations[0].Instances[0]
+            dispatch(setState("instanceId", instance.InstanceId))
+            dispatch(setState("publicDnsName", instance.PublicDnsName))
+            dispatch(setState("step", "KeyScript"))
+          },
+          catch: (err) => alert(err.message)
         }
       })
-    dispatch(setState("instances", data))
+    },
+    catch: (err) => alert(err.message)
+  }})
+}
+
+const onClickFindInstances = ({
+  dispatch,
+}) => {
+  findInstances({
+    callbacks: {
+      then: (data) => {
+        data = data.Reservations
+          .map((reservation) => {
+            let instance = reservation.Instances[0]
+            return {
+              InstanceId: instance.InstanceId,
+              PublicDnsName: instance.PublicDnsName,
+              LaunchTime: instance.LaunchTime,
+              KeyName: instance.KeyName,
+            }
+          })
+        dispatch(setState("instances", data))
+      },
+      catch: (err) => alert(err.message)
+    }
   })
 }
 
@@ -144,10 +72,10 @@ const InstanceCreation = ({
     <Form>
       <Form.Group>
         <Button block
-          onClick={() => fetchInstances({
-            dispatch,
+          onClick={() => onClickFindInstances({
+            dispatch
           })}
-        >Fetch Existing Instances</Button>
+        >Find Existing Instances</Button>
       </Form.Group>
       <Form.Group hidden={instances.length === 0}>
         <Form.Control
