@@ -11,24 +11,39 @@ import {
 import {
   createInstance,
   findInstances,
+  tagInstance,
 } from "../helpers/aws-instance-helper"
 import { createSshSecurityGroup } from "../helpers/aws-security-group-helper"
 
 const onClickCreateInstance = ({
   dispatch,
+  instanceName,
 }) => {
-  createSshSecurityGroup({ name: "NAME2", callbacks: {
+  createSshSecurityGroup({ name: instanceName, callbacks: {
     then: () => {
       createInstance({
         params: {
-          SecurityGroups: [ "NAME2" ],
+          SecurityGroups: [ instanceName ],
         },
         callbacks: {
           then: (data) => {
             let instance = data.Reservations[0].Instances[0]
             dispatch(setState("instanceId", instance.InstanceId))
             dispatch(setState("publicDnsName", instance.PublicDnsName))
-            dispatch(setState("step", "KeyScript"))
+
+            tagInstance({
+              instanceId: instance.InstanceId,
+              tags: [{ Key: "Name", Value: instanceName }],
+              callbacks: {
+                then: (data) => {
+                  setTimeout(() => {
+                    dispatch(setState("step", "KeyScript"))
+                  }, 1000)
+                },
+                catch: (err) => alert(err.message) 
+              }
+            })
+            
           },
           catch: (err) => alert(err.message)
         }
@@ -47,11 +62,12 @@ const onClickFindInstances = ({
         data = data.Reservations
           .map((reservation) => {
             let instance = reservation.Instances[0]
+            let nameTag = instance.Tags.filter((e) => !!e && e.Key === "Name")[0]
             return {
+              InstanceName: !nameTag ? "(no name)" : nameTag.Value,
               InstanceId: instance.InstanceId,
               PublicDnsName: instance.PublicDnsName,
               LaunchTime: instance.LaunchTime,
-              KeyName: instance.KeyName,
             }
           })
         dispatch(setState("instances", data))
@@ -66,6 +82,7 @@ const InstanceCreation = ({
   publicDnsName,
   instanceId,
   instances,
+  instanceName,
   selectedPublicDnsName,
 }) => (
   <div>
@@ -89,9 +106,9 @@ const InstanceCreation = ({
               .map((instance) => <option key={instance.PublicDnsName}
                 value={instance.PublicDnsName}>
                   {[
+                    instance.InstanceName,
                     instance.PublicDnsName,
                     instance.InstanceId,
-                    instance.KeyName,
                     instance.LaunchTime.toLocaleString(),
                   ].join(", ")}
                 </option>
@@ -111,9 +128,18 @@ const InstanceCreation = ({
         or
       </Form.Group>
       <Form.Group>
+        <Form.Control
+          type="text"
+          placeholder="Enter name"
+          onChange={(event) => dispatch(setState("instanceName", event.target.value))}
+        />
+      </Form.Group>
+      <Form.Group>
         <Button block
+          disabled={!instanceName}
           onClick={() => onClickCreateInstance({
-            dispatch
+            dispatch,
+            instanceName,
           })}
         >Create Instance</Button>
       </Form.Group>
@@ -137,6 +163,7 @@ export default connect(state => ({
   pem: state.app.pem,
   publicDnsName: state.app.publicDnsName,
   instanceId: state.app.instanceId,
+  instanceName: state.app.instanceName, 
   instances: state.app.instances,
   selectedPublicDnsName: state.app.selectedPublicDnsName,
 }), null) (InstanceCreation)

@@ -54,3 +54,16 @@ export const findInstances = ({
   })
 }
 
+export const tagInstance = ({
+  instanceId,
+  tags,
+  callbacks,
+}) => {
+  new AWS.EC2().createTags({
+    Resources: [ instanceId ],
+    Tags: tags,
+  }).promise()
+    .then(callbacks.then)
+    .catch(callbacks.catch)
+}
+

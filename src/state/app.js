@@ -5,6 +5,7 @@ const initialState = {
   debug: false,
   instances: [],
   instanceId: "",
+  instanceName: "",
   loading: false,
   pem: "",
   publicDnsName: "",

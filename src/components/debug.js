@@ -25,6 +25,7 @@ export default connect(state => ({
     debug: state.app.debug,
     instances: state.app.instances,
     instanceId: state.app.instanceId,
+    instanceName: state.app.instanceName,
     loading: state.app.loading,
     publicDnsName: state.app.publicDnsName,
     secretAccessKey: state.app.secretAccessKey,

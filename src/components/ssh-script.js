@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form"
 import { connect } from "react-redux"
 
 const script = (publicDnsName, keyPath) => {
-  return `ssh -i ${keyPath} ubuntu@${publicDnsName}`
+  return `echo "ssh -i ${keyPath} ubuntu@${publicDnsName}" >> start.sh`
 }
 
 const copyToClipboard = (text) => {
@@ -25,12 +25,14 @@ const PemFile = ({
   <div>
     <Form>
       <Form.Group>
+        Touch to copy. Paste it in your console.
+      </Form.Group>
+      <Form.Group>
         <div
           style={{ fontStyle: "italic" }}
           onClick={() => copyToClipboard(script(publicDnsName, "key.pem"))}
           onKeyDown={() => copyToClipboard(script(publicDnsName, "key.pem"))}
         >
-          <br />
           {script(publicDnsName, "key.pem")}
           <br />
         </div>
