@@ -15,20 +15,23 @@ This project will help developers who need to use mobile for developent for some
 ### For Development in Cloud
 ..for those unfortunate souls like myself who has noaccess to laptop due to circumstances
 - Create nginx config file
+
   `sudo vim /etc/nginx/sites-available/ec2-wrapper`
-  Then add following:
+
+  Then add the following:
   ```
-server {
-  listen 80;
-  server_name ec2-wrapper;
-  location / {
-    proxy_set_header  X-Real-IP  $remote_addr;
-    proxy_set_header  Host       $http_host;
-    proxy_pass        http://127.0.0.1:3000;
+  server {
+    listen 80;
+    server_name ec2-wrapper;
+    location / {
+      proxy_set_header  X-Real-IP  $remote_addr;
+      proxy_set_header  Host       $http_host;
+      proxy_pass        http://127.0.0.1:3000;
+    }
   }
-}
   ```
 - Create symlink to the config file
+
   `sudo ln -s /etc/nginx/sites-available/ec2-wrapper /etc/nginx/sites-enabled/ec2-wrapper`
 
 ## Run
